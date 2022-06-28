@@ -1,0 +1,338 @@
+# WEATHERMAN DASHBOARD
+# For Home Assistant and ESPHome
+# Designed by Madelena Mak 2022 - https://mmak.es
+
+# Cue "Blame it on the Weatherman" by B*Witched!
+esphome:
+  name: "weatherman"
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esphome-Web-901078"
+    password: "2JOrpBYEHQsV"
+
+# Include custom fonts
+font:
+  - file: 'fonts/GothamRnd-Book.ttf'
+    id: font_small_book
+    size: 18
+  - file: 'fonts/GothamRnd-Bold.ttf'
+    id: font_large_bold
+    size: 108
+    glyphs: [' ', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C']
+  - file: 'fonts/GothamRnd-Bold.ttf'
+    id: font_medium_bold
+    size: 30
+    # glyphs: [' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'M', 'I', 'N']
+  - file: 'fonts/GothamRnd-Bold.ttf'
+    id: font_small_bold
+    size: 18
+    # glyphs: ['°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', 'M', 'I', 'N']
+
+  # Include Material Design Icons font
+  # Thanks to https://community.home-assistant.io/t/display-materialdesign-icons-on-esphome-attached-to-screen/199790/16
+  - file: 'fonts/materialdesignicons-webfont.ttf'
+    id: font_mdi_large
+    size: 96
+    glyphs: &mdi-weather-glyphs
+      - "\U000F0590" # mdi-weather-cloudy
+      - "\U000F0F2F" # mdi-weather-cloudy-alert
+      - "\U000F0E6E" # mdi-weather-cloudy-arrow-right
+      - "\U000F0591" # mdi-weather-fog
+      - "\U000F0592" # mdi-weather-hail
+      - "\U000F0F30" # mdi-weather-hazy
+      - "\U000F0898" # mdi-weather-hurricane
+      - "\U000F0593" # mdi-weather-lightning
+      - "\U000F067E" # mdi-weather-lightning-rainy
+      - "\U000F0594" # mdi-weather-night
+      - "\U000F0F31" # mdi-weather-night-partly-cloudy
+      - "\U000F0595" # mdi-weather-partly-cloudy
+      - "\U000F0F32" # mdi-weather-partly-lightning
+      - "\U000F0F33" # mdi-weather-partly-rainy
+      - "\U000F0F34" # mdi-weather-partly-snowy
+      - "\U000F0F35" # mdi-weather-partly-snowy-rainy
+      - "\U000F0596" # mdi-weather-pouring
+      - "\U000F0597" # mdi-weather-rainy
+      - "\U000F0598" # mdi-weather-snowy
+      - "\U000F0F36" # mdi-weather-snowy-heavy
+      - "\U000F067F" # mdi-weather-snowy-rainy
+      - "\U000F0599" # mdi-weather-sunny
+      - "\U000F0F37" # mdi-weather-sunny-alert
+      - "\U000F14E4" # mdi-weather-sunny-off
+      - "\U000F059A" # mdi-weather-sunset
+      - "\U000F059B" # mdi-weather-sunset-down
+      - "\U000F059C" # mdi-weather-sunset-up
+      - "\U000F0F38" # mdi-weather-tornado
+      - "\U000F059D" # mdi-weather-windy
+      - "\U000F059E" # mdi-weather-windy-variant
+  - file: 'fonts/materialdesignicons-webfont.ttf'
+    id: font_mdi_medium
+    size: 36
+    glyphs: *mdi-weather-glyphs
+
+
+# Include Custom Titles
+image:
+  - file: "images/weatherman-title-train.png"
+    id: title_train
+    type: BINARY
+  - file: "images/weatherman-title-weather.png"
+    id: title_weather
+    type: BINARY
+
+
+# Call Subway and Weather sensors from HA
+sensor:
+  - platform: homeassistant
+    entity_id: sensor.gtfs_mta_subway_manhattan 
+    id: train_manhattan_due_in
+
+  - platform: homeassistant
+    entity_id: sensor.gtfs_mta_subway_canarsie
+    id: train_canarsie_due_in
+    
+  - platform: homeassistant
+    entity_id: sensor.gtfs_mta_subway_manhattan
+    attribute: Next bus due in
+    id: train_manhattan_next_train_due_in
+    
+  - platform: homeassistant
+    entity_id: sensor.gtfs_mta_subway_canarsie
+    attribute: Next bus due in
+    id: train_canarsie_next_train_due_in
+
+  - platform: homeassistant
+    entity_id: weather.hourly
+    attribute: temperature
+    id: weather_temperature
+
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_temperature_0
+    id: weather_temperature_0
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_temperature_1
+    id: weather_temperature_1
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_temperature_2
+    id: weather_temperature_2
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_temperature_3
+    id: weather_temperature_3
+
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    id: wifisignal
+    update_interval: 60s
+
+
+text_sensor:
+  - platform: homeassistant
+    entity_id: sensor.gtfs_mta_subway_manhattan
+    attribute: Due at
+    id: train_manhattan_due_at
+  
+  - platform: homeassistant
+    entity_id: sensor.gtfs_mta_subway_canarsie
+    attribute: Due at
+    id: train_canarsie_due_at
+  
+  - platform: homeassistant
+    entity_id: sensor.gtfs_mta_subway_manhattan
+    attribute: Next bus
+    id: train_manhattan_next_train_due_at
+  
+  - platform: homeassistant
+    entity_id: sensor.gtfs_mta_subway_canarsie
+    attribute: Next bus
+    id: train_canarsie_next_train_due_at
+
+  - platform: homeassistant
+    entity_id: sensor.mta_subway_l_service_status
+    id: train_service_status
+
+  - platform: homeassistant
+    entity_id: weather.hourly
+    id: weather_state
+
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_condition_now
+    id: weather_condition_now
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_condition_0
+    id: weather_condition_0
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_timestamp_0
+    id: weather_timestamp_0
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_condition_1
+    id: weather_condition_1
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_timestamp_1
+    id: weather_timestamp_1
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_condition_2
+    id: weather_condition_2
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_timestamp_2
+    id: weather_timestamp_2
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_condition_3
+    id: weather_condition_3
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: weather_timestamp_3
+    id: weather_timestamp_3
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: train_status
+    id: train_status
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: train_status_manhattan
+    id: train_status_manhattan
+  - platform: homeassistant
+    entity_id: sensor.weatherman_data
+    attribute: train_status_canarsie
+    id: train_status_canarsie
+
+
+# Define colors
+# This design is white on black so this is necessary.
+color:
+  - id: color_black
+    red: 0%
+    green: 0%
+    blue: 0%
+    white: 50%
+  - id: color_white
+    red: 0%
+    green: 0%
+    blue: 0%
+    white: 0%
+
+
+# Pins for Waveshare ePaper ESP Board
+spi:
+  clk_pin: GPIO13
+  mosi_pin: GPIO14
+
+
+# Now render everything on the ePaper screen.
+display:
+  - platform: waveshare_epaper
+    cs_pin: GPIO15
+    dc_pin: GPIO27
+    busy_pin: GPIO25
+    reset_pin: GPIO26
+    model: 7.50inV2
+    update_interval: 1min
+    rotation: 90°
+    lambda: |-
+      // Map weather states to MDI characters.
+      std::map<std::string, std::string> weather_icon_map
+        {
+          {"cloudy", "\U000F0590"},
+          {"cloudy-alert", "\U000F0F2F"},
+          {"cloudy-arrow-right", "\U000F0E6E"},
+          {"fog", "\U000F0591"},
+          {"hail", "\U000F0592"},
+          {"hazy", "\U000F0F30"},
+          {"hurricane", "\U000F0898"},
+          {"lightning", "\U000F0593"},
+          {"lightning-rainy", "\U000F067E"},
+          {"night", "\U000F0594"},
+          {"night-partly-cloudy", "\U000F0F31"},
+          {"partlycloudy", "\U000F0595"},
+          {"partly-lightning", "\U000F0F32"},
+          {"partly-rainy", "\U000F0F33"},
+          {"partly-snowy", "\U000F0F34"},
+          {"partly-snowy-rainy", "\U000F0F35"},
+          {"pouring", "\U000F0596"},
+          {"rainy", "\U000F0597"},
+          {"snowy", "\U000F0598"},
+          {"snowy-heavy", "\U000F0F36"},
+          {"snowy-rainy", "\U000F067F"},
+          {"sunny", "\U000F0599"},
+          {"sunny-alert", "\U000F0F37"},
+          {"sunny-off", "\U000F14E4"},
+          {"sunset", "\U000F059A"},
+          {"sunset-down", "\U000F059B"},
+          {"sunset-up", "\U000F059C"},
+          {"tornado", "\U000F0F38"},
+          {"windy", "\U000F059D"},
+          {"windy-variant", "\U000F059E"},
+        };
+
+      // Fill background in black.
+      it.fill(color_black);
+
+      // Weather Section
+      it.image(0, 88, id(title_weather)); 
+
+      it.printf(100, 158, id(font_mdi_large), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+
+      it.printf(300, 158, id(font_large_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature).state);
+
+      it.printf(105, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_0).state.c_str());
+      it.printf(105, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_0).state.c_str()].c_str());
+      it.printf(105, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_0).state);
+
+      it.printf(195, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_1).state.c_str());
+      it.printf(195, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_1).state.c_str()].c_str());
+      it.printf(195, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_1).state);
+
+      it.printf(285, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_2).state.c_str());
+      it.printf(285, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_2).state.c_str()].c_str());
+      it.printf(285, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_2).state);
+
+      it.printf(375, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_3).state.c_str());
+      it.printf(375, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_3).state.c_str()].c_str());
+      it.printf(375, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_3).state);
+
+      // Train Service Section
+      it.image(0, 420, id(title_train)); 
+      it.printf(240, 480, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%s", id(train_status).state.c_str());
+
+      it.print(150, 536, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "TO MANHATTAN");
+      it.print(330, 536, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "TO CANARSIE");
+
+      it.printf(150, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_due_in).state);
+      it.printf(330, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_due_in).state);
+      it.printf(150, 608, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
+      it.printf(330, 608, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
+
+      it.printf(150, 652, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_next_train_due_in).state);
+      it.printf(330, 652, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_next_train_due_in).state);
+      it.printf(150, 684, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_manhattan_next_train_due_at).state.c_str());
+      it.printf(330, 684, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_canarsie_next_train_due_at).state.c_str());
+
+captive_portal:

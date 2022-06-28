@@ -1,0 +1,82 @@
+
+sensor:
+
+  # Look up train arrival times using the GTFS_RT custom component (https://github.com/zacs/ha-gtfs-rt).
+  # You need to get your own MTA API Key, and also look up the stopID of your station at: https://transitfeeds.com/p/mta/79/latest/stops
+  
+  # Alternatively, you can also use the GoodService.io API:
+  # https://www.goodservice.io/api/stops/<stop_id>
+
+  - platform: gtfs_rt
+    trip_update_url: "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-l"
+    x_api_key: ENTER_YOUR_OWN_API_KEY
+    scan_interval: 60
+    entity_namespace: gtfs_mta_subway
+    departures:
+      - name: "Station (Northbound)"
+        route: "X"
+        stopid: "X00N"
+      - name: "Station (Southboard)"
+        route: "X"
+        stopid: "X00S"
+
+
+  # Get train service status from Goodservice.io
+
+  - platform: rest
+    resource: https://www.goodservice.io/api/routes/L
+    method: GET
+    scan_interval: 300
+    name: "MTA Subway L Service Status"
+    value_template: "{{ value_json.status }}"
+    json_attributes:
+      - "color"
+      - "service_change_summaries"
+      - "direction_statuses"
+      - "delay_summaries"
+      - "service_irregularity_summaries"
+      - "service_changes"
+
+
+# Bundle up all the data to send over to Weatherman.
+template:
+
+  - trigger:
+      platform: time_pattern
+      minutes: "/1"
+    sensor:
+      - name: Weatherman Data
+        state: "OK"
+        attributes:
+          train_status: >
+            {{ states('sensor.mta_subway_l_service_status') | upper }}
+          train_status_manhattan: >
+            {{ state_attr('sensor.mta_subway_l_service_status', 'direction_statuses').north | upper }}
+          train_status_canarsie: >
+            {{ state_attr('sensor.mta_subway_l_service_status', 'direction_statuses').south | upper }}
+          weather_condition_now: >
+            {{ states('weather.hourly') }}
+          weather_condition_0: >
+            {{ state_attr('weather.hourly', 'forecast')[0].condition }}
+          weather_temperature_0: >
+            {{ state_attr('weather.hourly', 'forecast')[0].temperature | round }}
+          weather_timestamp_0: >
+            {{ as_timestamp(state_attr('weather.hourly', 'forecast')[0].datetime) | timestamp_custom('%I') | int }} {{ as_timestamp(state_attr('weather.hourly', 'forecast')[0].datetime) | timestamp_custom('%p') }}
+          weather_condition_1: >
+            {{ state_attr('weather.hourly', 'forecast')[1].condition }}
+          weather_temperature_1: >
+            {{ state_attr('weather.hourly', 'forecast')[1].temperature | round }}
+          weather_timestamp_1: >
+            {{ as_timestamp(state_attr('weather.hourly', 'forecast')[1].datetime) | timestamp_custom('%I') | int }} {{ as_timestamp(state_attr('weather.hourly', 'forecast')[1].datetime) | timestamp_custom('%p') }}
+          weather_condition_2: >
+            {{ state_attr('weather.hourly', 'forecast')[2].condition }}
+          weather_temperature_2: >
+            {{ state_attr('weather.hourly', 'forecast')[2].temperature | round }}
+          weather_timestamp_2: >
+            {{ as_timestamp(state_attr('weather.hourly', 'forecast')[2].datetime) | timestamp_custom('%I') | int }} {{ as_timestamp(state_attr('weather.hourly', 'forecast')[2].datetime) | timestamp_custom('%p') }}
+          weather_condition_3: >
+            {{ state_attr('weather.hourly', 'forecast')[3].condition }}
+          weather_temperature_3: >
+            {{ state_attr('weather.hourly', 'forecast')[3].temperature | round }}
+          weather_timestamp_3: >
+            {{ as_timestamp(state_attr('weather.hourly', 'forecast')[3].datetime) | timestamp_custom('%I') | int }} {{ as_timestamp(state_attr('weather.hourly', 'forecast')[3].datetime) | timestamp_custom('%p') }}
