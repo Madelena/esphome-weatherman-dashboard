@@ -17,21 +17,21 @@ This is part of the ecosystem for [my Home Assistant configuration](https://gith
 
 1. No soldering is required since the e-Paper driver board was integrated into the ESP32 board. All I needed to do was to connect the e-Paper screen to the driver board, and then connect the driver board to the USB socket on my light switch.
 2. Copy `/fonts`, `/images`, and `weatherman.yaml` to your /.config/esphome folder.
-3. Add the content of `templates.yaml` to your Home Assistant template configuration YAML file.
-3. Once booted, flash `weatherman.yaml` the ESP32 board using ESPHome.
-4. Enjoy!
+3. Integrate the content of `sensor.yaml` to your Home Assistant template configuration YAML file.
+4. Install HA-GTFS-RT to your Home Assistant using HACS.
+5. Once booted, flash `weatherman.yaml` the ESP32 board using ESPHome.
+6. Enjoy!
 
 ## Data Sources
 
-- Metno Hourly Weather Forecast
+- Metno Hourly Weather Forecast HA integration
 - Goodservice.io API
+- [GTFS-RT Custom Component](https://github.com/zacs/ha-gtfs-rt)
 
 ## References
 
 Here are some other repos that I referenced from:
 - https://github.com/DeastinY/esphome-waveshare-e-paper-dashboard
 - https://github.com/savikko/smarthome
-
-
 
 *Weatherman* is a reference to the song *Blame it on the Weatherman* by B*Witched. If you're late to your date because of this, blame it on the Weatherman.
