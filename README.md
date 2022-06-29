@@ -1,6 +1,6 @@
 # Weatherman Dashboard for ESPHome
 
-<img src="https://user-images.githubusercontent.com/4341881/176365452-1e027b60-142e-4263-927b-b97c324edfd0.jpeg" width="50%" alt="Context"/>
+<img src="https://user-images.githubusercontent.com/4341881/176365452-1e027b60-142e-4263-927b-b97c324edfd0.jpeg" width="66%" alt="Context"/>
 
 I have multiple dashboards around my apartment and they display different information depending on the context. Since this is placed near the front door, it contains concise information for what's outside with a homey style to match the rest of the wall.
 
@@ -15,7 +15,7 @@ This is part of the ecosystem for [my Home Assistant configuration](https://gith
 - [Micro USB Thin Ribbon Cable](https://amzn.to/3AatofQ)
 - [Angled USB Thin Ribbon Cable](https://amzn.to/3blAhQT)
 
-<img src="https://user-images.githubusercontent.com/4341881/176365459-4c61855c-7ade-44d9-84c6-0bb3b22b0b67.jpeg" width="50%" alt="Closeup"/>
+<img src="https://user-images.githubusercontent.com/4341881/176365459-4c61855c-7ade-44d9-84c6-0bb3b22b0b67.jpeg" width="66%" alt="Closeup"/>
 
 ## Installation
 
