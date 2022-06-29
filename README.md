@@ -43,4 +43,4 @@ Here are some other repos that I referenced from:
 - https://github.com/DeastinY/esphome-waveshare-e-paper-dashboard
 - https://github.com/savikko/smarthome
 
-*Weatherman* is a reference to the song *Blame it on the Weatherman* by B*Witched. If you're late to your date because of this, blame it on the Weatherman.
+*Weatherman* is a reference to the song [*Blame it on the Weatherman* by B*Witched](https://www.youtube.com/watch?v=HTwiK8z2m_Y). If you're late to your date because of this, blame it on the Weatherman.
