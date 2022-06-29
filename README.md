@@ -17,6 +17,11 @@ This is part of the ecosystem for [my Home Assistant configuration](https://gith
 
 <img src="https://user-images.githubusercontent.com/4341881/176365459-4c61855c-7ade-44d9-84c6-0bb3b22b0b67.jpeg" width="66%" alt="Closeup"/>
 
+## Software
+
+- ESPHome
+- Home Assistant running on a Raspberry Pi as a remote server
+
 ## Installation
 
 1. No soldering is required since the e-Paper driver board was integrated into the ESP32 board. All I needed to do was to connect the e-Paper screen to the driver board, and then connect the driver board to the USB socket on my light switch.
