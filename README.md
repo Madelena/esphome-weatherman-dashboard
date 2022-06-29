@@ -8,7 +8,7 @@ This is part of the ecosystem for [my Home Assistant configuration](https://gith
 
 ## Hardware
 
-- [Waveshare 7.5" e-Paper Screen](https://amzn.to/3R1tTyS) - 640x384 display resolution
+- [Waveshare 7.5" e-Paper Screen](https://amzn.to/3a85x5D) - 480x800 display resolution
 - [Waveshare Universal e-Paper Driver Board with ESP32](https://amzn.to/3nkMRT8)
 - [Ikea RIBBA Picture Frame 5"x7"](https://amzn.to/3QM3Zip)
 - [Legrand 3 Way Switch + USB](https://amzn.to/3u7EKNz)
