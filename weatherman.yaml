@@ -328,7 +328,7 @@ display:
       it.printf(150, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_due_in).state);
       it.printf(330, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_due_in).state);
       it.printf(150, 608, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
-      it.printf(330, 608, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
+      it.printf(330, 608, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_canarsie_due_at).state.c_str());
 
       it.printf(150, 652, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_next_train_due_in).state);
       it.printf(330, 652, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_next_train_due_in).state);
