@@ -5,6 +5,10 @@
 # Cue "Blame it on the Weatherman" by B*Witched!
 esphome:
   name: "weatherman"
+  on_boot:
+      priority: 200.0
+      then:
+        - component.update: eink_display
 
 esp32:
   board: esp32dev
