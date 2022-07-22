@@ -19,6 +19,28 @@ api:
 
 ota:
 
+globals:
+  - id: data_updated
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+    on_time:
+      - seconds: 30
+        then:
+          - if:
+              condition:
+                lambda: 'return id(data_updated) == true;'
+              then:
+                - logger.log: "Sensor data updated: Refreshing display..."
+                - component.update: eink_display
+                - lambda: 'id(data_updated) = false;'
+              else:
+                - logger.log: "No sensors updated - skipping display refresh."
+
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
@@ -103,42 +125,69 @@ sensor:
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan 
     id: train_manhattan_due_in
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_canarsie
     id: train_canarsie_due_in
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
     
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan
     attribute: Next bus due in
     id: train_manhattan_next_train_due_in
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
     
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_canarsie
     attribute: Next bus due in
     id: train_canarsie_next_train_due_in
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: weather.hourly
     attribute: temperature
     id: weather_temperature
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_0
     id: weather_temperature_0
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_1
     id: weather_temperature_1
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_2
     id: weather_temperature_2
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_3
     id: weather_temperature_3
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
 
   - platform: wifi_signal
     name: "WiFi Signal Sensor"
@@ -151,78 +200,132 @@ text_sensor:
     entity_id: sensor.gtfs_mta_subway_manhattan
     attribute: Due at
     id: train_manhattan_due_at
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_canarsie
     attribute: Due at
     id: train_canarsie_due_at
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan
     attribute: Next bus
     id: train_manhattan_next_train_due_at
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_canarsie
     attribute: Next bus
     id: train_canarsie_next_train_due_at
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.mta_subway_l_service_status
     id: train_service_status
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: weather.hourly
     id: weather_state
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_condition_now
     id: weather_condition_now
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_condition_0
     id: weather_condition_0
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_timestamp_0
     id: weather_timestamp_0
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_condition_1
     id: weather_condition_1
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_timestamp_1
     id: weather_timestamp_1
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_condition_2
     id: weather_condition_2
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_timestamp_2
     id: weather_timestamp_2
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_condition_3
     id: weather_condition_3
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_timestamp_3
     id: weather_timestamp_3
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: train_status
     id: train_status
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: train_status_manhattan
     id: train_status_manhattan
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: train_status_canarsie
     id: train_status_canarsie
+    on_value:
+      then:
+         - lambda: 'id(data_updated) = true;'
 
 
 # Define colors
@@ -254,7 +357,8 @@ display:
     busy_pin: GPIO25
     reset_pin: GPIO26
     model: 7.50inV2
-    update_interval: 5min
+    update_interval: never
+    id: eink_display
     rotation: 90°
     lambda: |-
       // Map weather states to MDI characters.
