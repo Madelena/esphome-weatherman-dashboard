@@ -254,7 +254,7 @@ display:
     busy_pin: GPIO25
     reset_pin: GPIO26
     model: 7.50inV2
-    update_interval: 5min
+    update_interval: 2h # A shorter update interval will damage the screen.
     rotation: 90°
     lambda: |-
       // Map weather states to MDI characters.
