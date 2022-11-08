@@ -23,6 +23,7 @@ api:
 
 ota:
 
+# Global variables for detecting if the display needs to be refreshed. (Thanks @paviro!)
 globals:
   - id: data_updated
     type: bool
@@ -33,23 +34,35 @@ globals:
     restore_value: no
     initial_value: 'false'
 
+
+# Check whether the display needs to be refreshed every minute,
+# based on whether new data is received or motion is detected. (Thanks @paviro!)
 time:
   - platform: homeassistant
     id: homeassistant_time
     on_time:
-      - seconds: 30
+      - seconds: 0
+        minutes: /1
         then:
           - if:
               condition:
                 lambda: 'return id(data_updated) == true;'
               then:
                 - lambda: 'id(initial_data_received) = true;'
-                - logger.log: "Sensor data updated: Refreshing display..."
+                - if:
+                    condition:
+                      binary_sensor.is_on: motion_detected
+                    then:
+                      - logger.log: "Sensor data updated and activity in home detected: Refreshing display..."
                 - component.update: eink_display
                 - lambda: 'id(data_updated) = false;'
               else:
+                      - logger.log: "Sensor data updated but no activity in home - skipping display refresh."
+              else:
                 - logger.log: "No sensors updated - skipping display refresh."
 
+
+# Wifi information
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
@@ -135,7 +148,14 @@ font:
 #     type: BINARY
 
 
-# Call Subway and Weather sensors from HA
+# Check if motion is detected in the living room.
+binary_sensor:
+  - platform: homeassistant
+    entity_id: binary_sensor.weatherman_motion_detected
+    id: motion_detected
+
+
+# Call Subway and Weather sensors from HA.
 sensor:
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan 
@@ -182,6 +202,7 @@ sensor:
     on_value:
       then:
          - lambda: 'id(data_updated) = true;'
+
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_1
@@ -189,6 +210,7 @@ sensor:
     on_value:
       then:
          - lambda: 'id(data_updated) = true;'
+
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_2
@@ -196,6 +218,7 @@ sensor:
     on_value:
       then:
          - lambda: 'id(data_updated) = true;'
+
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_3
@@ -313,6 +336,7 @@ text_sensor:
     on_value:
       then:
          - lambda: 'id(data_updated) = true;'
+
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: train_status
