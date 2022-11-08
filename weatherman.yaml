@@ -384,13 +384,14 @@ spi:
 # Now render everything on the ePaper screen.
 display:
   - platform: waveshare_epaper
+    id: eink_display
     cs_pin: GPIO15
     dc_pin: GPIO27
     busy_pin: GPIO25
     reset_pin: GPIO26
+    reset_duration: 2ms
     model: 7.50inV2
     update_interval: never
-    id: eink_display
     rotation: 90°
     lambda: |-
       // Map weather states to MDI characters.
