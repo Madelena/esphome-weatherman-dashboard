@@ -346,16 +346,16 @@ text_sensor:
 # Define colors
 # This design is white on black so this is necessary.
 color:
-  - id: color_black
-    red: 0%
-    green: 0%
-    blue: 0%
-    white: 50%
-  - id: color_white
+  - id: color_bg
     red: 0%
     green: 0%
     blue: 0%
     white: 0%
+  - id: color_text
+    red: 0%
+    green: 0%
+    blue: 0%
+    white: 100%
 
 
 # Pins for Waveshare ePaper ESP Board
@@ -411,8 +411,8 @@ display:
           {"windy-variant", "\U000F059E"},
         };
 
-      // Fill background in black.
-      it.fill(color_black);
+      // Fill background.
+      // it.fill(color_bg);
 
       if (id(initial_data_received) == false) {
         // ATTENTION!
