@@ -42,14 +42,11 @@ template:
 
   # Update screen only when occupancy is detected.
 
-  - trigger:
-      platform: time_pattern
-      seconds: "/5"
-    binary_sensor:
+  - binary_sensor:
       - name: Weatherman Motion Detected
         unique_id: "dfa78de7-d761-425f-9731-86f1af332eac"
         device_class: "occupancy"
-        delay_off: 5min
+        delay_off: 1min
         state: >-
           {%- if states('binary_sensor.living_room_hue_sensor_motion') == 'on' or states('binary_sensor.front_door_switchbot_contact_sensor_motion_detected') == 'on' or states('binary_sensor.kitchen_counter_motion_sensor_motion') == 'on' %}
             on
