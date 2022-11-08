@@ -407,35 +407,34 @@ display:
       // Fill background.
       // it.fill(color_bg);
 
+      // Show loading screen before data is received.
       if (id(initial_data_received) == false) {
-        // ATTENTION!
-        // Please adjust coordinates I have a different display!
-        // ATTENTION!
-        it.printf(0, 420, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "Waiting for data...");
+        it.printf(240, 390, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "WAITING FOR DATA...");
       } else {
+
         // Weather Section
         // it.image(0, 88, id(title_weather)); 
         it.printf(240, 84, id(font_title), color_text, TextAlign::TOP_CENTER, "WEATHER");
 
-        it.printf(100, 158, id(font_mdi_large), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+        it.printf(100, 158, id(font_mdi_large), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
 
-        it.printf(300, 158, id(font_large_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature).state);
+        it.printf(300, 158, id(font_large_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature).state);
 
-        it.printf(105, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_0).state.c_str());
-        it.printf(105, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_0).state.c_str()].c_str());
-        it.printf(105, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_0).state);
+        it.printf(105, 282, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_0).state.c_str());
+        it.printf(105, 306, id(font_mdi_medium), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_0).state.c_str()].c_str());
+        it.printf(105, 354, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_0).state);
 
-        it.printf(195, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_1).state.c_str());
-        it.printf(195, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_1).state.c_str()].c_str());
-        it.printf(195, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_1).state);
+        it.printf(195, 282, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_1).state.c_str());
+        it.printf(195, 306, id(font_mdi_medium), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_1).state.c_str()].c_str());
+        it.printf(195, 354, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_1).state);
 
-        it.printf(285, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_2).state.c_str());
-        it.printf(285, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_2).state.c_str()].c_str());
-        it.printf(285, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_2).state);
+        it.printf(285, 282, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_2).state.c_str());
+        it.printf(285, 306, id(font_mdi_medium), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_2).state.c_str()].c_str());
+        it.printf(285, 354, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_2).state);
 
-        it.printf(375, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_3).state.c_str());
-        it.printf(375, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_3).state.c_str()].c_str());
-        it.printf(375, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_3).state);
+        it.printf(375, 282, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_3).state.c_str());
+        it.printf(375, 306, id(font_mdi_medium), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_3).state.c_str()].c_str());
+        it.printf(375, 354, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_3).state);
 
         // Train Service Section
         // it.image(0, 420, id(title_train)); 
@@ -448,14 +447,15 @@ display:
         it.print(330, 524, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "TO CANARSIE");
         it.printf(330, 546, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_status_canarsie).state.c_str());
 
-        it.printf(150, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_due_in).state);
-        it.printf(330, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_due_in).state);
-        it.printf(150, 608, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
-        it.printf(330, 608, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_canarsie_due_at).state.c_str());
+        it.printf(150, 584, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_due_in).state);
+        it.printf(330, 584, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_due_in).state);
+        it.printf(150, 616, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
+        it.printf(330, 616, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
 
-        it.printf(150, 652, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_next_train_due_in).state);
-        it.printf(330, 652, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_next_train_due_in).state);
-        it.printf(150, 684, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_manhattan_next_train_due_at).state.c_str());
-        it.printf(330, 684, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_canarsie_next_train_due_at).state.c_str());
+        it.printf(150, 652, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_next_train_due_in).state);
+        it.printf(330, 652, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_next_train_due_in).state);
+        it.printf(150, 684, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_manhattan_next_train_due_at).state.c_str());
+        it.printf(330, 684, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_canarsie_next_train_due_at).state.c_str());
       }
+
 captive_portal:
