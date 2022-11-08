@@ -126,13 +126,13 @@ font:
 
 
 # Include Custom Titles
-image:
-  - file: "images/weatherman-title-train.png"
-    id: title_train
-    type: BINARY
-  - file: "images/weatherman-title-weather.png"
-    id: title_weather
-    type: BINARY
+# image:
+#   - file: "images/weatherman-title-train.png"
+#     id: title_train
+#     type: BINARY
+#   - file: "images/weatherman-title-weather.png"
+#     id: title_weather
+#     type: BINARY
 
 
 # Call Subway and Weather sensors from HA
