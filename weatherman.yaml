@@ -59,6 +59,7 @@ wifi:
     ssid: "Esphome-Web-901078"
     password: "2JOrpBYEHQsV"
 
+
 # Include custom fonts
 font:
   - file: 'fonts/GothamRnd-Book.ttf'
@@ -69,6 +70,10 @@ font:
     size: 108
     glyphs: [' ', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C']
   - file: 'fonts/GothamRnd-Bold.ttf'
+    id: font_title
+    size: 54
+    glyphs: ['W', 'E', 'A', 'T', 'H', 'R', 'L', 'I', 'N', ' ']
+  - file: 'fonts/GothamRnd-Bold.ttf'
     id: font_medium_bold
     size: 30
     # glyphs: [' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'M', 'I', 'N']
@@ -76,6 +81,7 @@ font:
     id: font_small_bold
     size: 18
     # glyphs: ['°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', 'M', 'I', 'N']
+
 
   # Include Material Design Icons font
   # Thanks to https://community.home-assistant.io/t/display-materialdesign-icons-on-esphome-attached-to-screen/199790/16
@@ -415,7 +421,8 @@ display:
         it.printf(0, 420, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "Waiting for data...");
       } else {
         // Weather Section
-        it.image(0, 88, id(title_weather)); 
+        // it.image(0, 88, id(title_weather)); 
+        it.printf(240, 84, id(font_title), color_text, TextAlign::TOP_CENTER, "WEATHER");
 
         it.printf(100, 158, id(font_mdi_large), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
 
@@ -438,8 +445,8 @@ display:
         it.printf(375, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_3).state);
 
         // Train Service Section
-        it.image(0, 420, id(title_train)); 
-        it.printf(240, 480, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%s", id(train_status).state.c_str());
+        // it.image(0, 420, id(title_train)); 
+        it.printf(240, 408, id(font_title), color_text, TextAlign::TOP_CENTER, "L TRAIN");
 
         it.print(150, 536, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "TO MANHATTAN");
         it.print(330, 536, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "TO CANARSIE");
