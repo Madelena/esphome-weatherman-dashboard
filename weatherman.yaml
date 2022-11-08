@@ -23,6 +23,7 @@ api:
 
 ota:
 
+# Global variables for detecting if the display needs to be refreshed. (Thanks @paviro!)
 globals:
   - id: data_updated
     type: bool
@@ -33,23 +34,35 @@ globals:
     restore_value: no
     initial_value: 'false'
 
+
+# Check whether the display needs to be refreshed every minute,
+# based on whether new data is received or motion is detected. (Thanks @paviro!)
 time:
   - platform: homeassistant
     id: homeassistant_time
     on_time:
-      - seconds: 30
+      - seconds: 0
+        minutes: /1
         then:
           - if:
               condition:
                 lambda: 'return id(data_updated) == true;'
               then:
                 - lambda: 'id(initial_data_received) = true;'
-                - logger.log: "Sensor data updated: Refreshing display..."
+                - if:
+                    condition:
+                      binary_sensor.is_on: motion_detected
+                    then:
+                      - logger.log: "Sensor data updated and activity in home detected: Refreshing display..."
                 - component.update: eink_display
                 - lambda: 'id(data_updated) = false;'
               else:
+                      - logger.log: "Sensor data updated but no activity in home - skipping display refresh."
+              else:
                 - logger.log: "No sensors updated - skipping display refresh."
 
+
+# Wifi information
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
@@ -58,6 +71,7 @@ wifi:
   ap:
     ssid: "Esphome-Web-901078"
     password: "2JOrpBYEHQsV"
+
 
 # Include custom fonts
 font:
@@ -69,6 +83,10 @@ font:
     size: 108
     glyphs: [' ', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C']
   - file: 'fonts/GothamRnd-Bold.ttf'
+    id: font_title
+    size: 54
+    glyphs: ['W', 'E', 'A', 'T', 'H', 'R', 'L', 'I', 'N', ' ']
+  - file: 'fonts/GothamRnd-Bold.ttf'
     id: font_medium_bold
     size: 30
     # glyphs: [' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'M', 'I', 'N']
@@ -76,6 +94,7 @@ font:
     id: font_small_bold
     size: 18
     # glyphs: ['°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', 'M', 'I', 'N']
+
 
   # Include Material Design Icons font
   # Thanks to https://community.home-assistant.io/t/display-materialdesign-icons-on-esphome-attached-to-screen/199790/16
@@ -120,16 +139,23 @@ font:
 
 
 # Include Custom Titles
-image:
-  - file: "images/weatherman-title-train.png"
-    id: title_train
-    type: BINARY
-  - file: "images/weatherman-title-weather.png"
-    id: title_weather
-    type: BINARY
+# image:
+#   - file: "images/weatherman-title-train.png"
+#     id: title_train
+#     type: BINARY
+#   - file: "images/weatherman-title-weather.png"
+#     id: title_weather
+#     type: BINARY
 
 
-# Call Subway and Weather sensors from HA
+# Check if motion is detected in the living room.
+binary_sensor:
+  - platform: homeassistant
+    entity_id: binary_sensor.weatherman_motion_detected
+    id: motion_detected
+
+
+# Call Subway and Weather sensors from HA.
 sensor:
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan 
@@ -176,6 +202,7 @@ sensor:
     on_value:
       then:
          - lambda: 'id(data_updated) = true;'
+
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_1
@@ -183,6 +210,7 @@ sensor:
     on_value:
       then:
          - lambda: 'id(data_updated) = true;'
+
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_2
@@ -190,6 +218,7 @@ sensor:
     on_value:
       then:
          - lambda: 'id(data_updated) = true;'
+
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_temperature_3
@@ -238,14 +267,7 @@ text_sensor:
          - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: sensor.mta_subway_l_service_status
-    id: train_service_status
-    on_value:
-      then:
-         - lambda: 'id(data_updated) = true;'
-
-  - platform: homeassistant
-    entity_id: weather.hourly
+    entity_id: weather.valhalla_hourly
     id: weather_state
     on_value:
       then:
@@ -314,6 +336,7 @@ text_sensor:
     on_value:
       then:
          - lambda: 'id(data_updated) = true;'
+
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: train_status
@@ -340,16 +363,16 @@ text_sensor:
 # Define colors
 # This design is white on black so this is necessary.
 color:
-  - id: color_black
-    red: 0%
-    green: 0%
-    blue: 0%
-    white: 50%
-  - id: color_white
+  - id: color_bg
     red: 0%
     green: 0%
     blue: 0%
     white: 0%
+  - id: color_text
+    red: 0%
+    green: 0%
+    blue: 0%
+    white: 100%
 
 
 # Pins for Waveshare ePaper ESP Board
@@ -361,13 +384,14 @@ spi:
 # Now render everything on the ePaper screen.
 display:
   - platform: waveshare_epaper
+    id: eink_display
     cs_pin: GPIO15
     dc_pin: GPIO27
     busy_pin: GPIO25
     reset_pin: GPIO26
+    reset_duration: 2ms
     model: 7.50inV2
     update_interval: never
-    id: eink_display
     rotation: 90°
     lambda: |-
       // Map weather states to MDI characters.
@@ -405,53 +429,58 @@ display:
           {"windy-variant", "\U000F059E"},
         };
 
-      // Fill background in black.
-      it.fill(color_black);
+      // Fill background.
+      // it.fill(color_bg);
 
+      // Show loading screen before data is received.
       if (id(initial_data_received) == false) {
-        // ATTENTION!
-        // Please adjust coordinates I have a different display!
-        // ATTENTION!
-        it.printf(0, 420, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "Waiting for data...");
+        it.printf(240, 390, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "WAITING FOR DATA...");
       } else {
+
         // Weather Section
-        it.image(0, 88, id(title_weather)); 
+        // it.image(0, 88, id(title_weather)); 
+        it.printf(240, 84, id(font_title), color_text, TextAlign::TOP_CENTER, "WEATHER");
 
-        it.printf(100, 158, id(font_mdi_large), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
+        it.printf(100, 158, id(font_mdi_large), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_now).state.c_str()].c_str());
 
-        it.printf(300, 158, id(font_large_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature).state);
+        it.printf(300, 158, id(font_large_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature).state);
 
-        it.printf(105, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_0).state.c_str());
-        it.printf(105, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_0).state.c_str()].c_str());
-        it.printf(105, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_0).state);
+        it.printf(105, 282, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_0).state.c_str());
+        it.printf(105, 306, id(font_mdi_medium), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_0).state.c_str()].c_str());
+        it.printf(105, 354, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_0).state);
 
-        it.printf(195, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_1).state.c_str());
-        it.printf(195, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_1).state.c_str()].c_str());
-        it.printf(195, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_1).state);
+        it.printf(195, 282, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_1).state.c_str());
+        it.printf(195, 306, id(font_mdi_medium), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_1).state.c_str()].c_str());
+        it.printf(195, 354, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_1).state);
 
-        it.printf(285, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_2).state.c_str());
-        it.printf(285, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_2).state.c_str()].c_str());
-        it.printf(285, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_2).state);
+        it.printf(285, 282, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_2).state.c_str());
+        it.printf(285, 306, id(font_mdi_medium), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_2).state.c_str()].c_str());
+        it.printf(285, 354, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_2).state);
 
-        it.printf(375, 282, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_3).state.c_str());
-        it.printf(375, 306, id(font_mdi_medium), color_white, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_3).state.c_str()].c_str());
-        it.printf(375, 354, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_3).state);
+        it.printf(375, 282, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(weather_timestamp_3).state.c_str());
+        it.printf(375, 306, id(font_mdi_medium), color_text, TextAlign::TOP_CENTER, "%s", weather_icon_map[id(weather_condition_3).state.c_str()].c_str());
+        it.printf(375, 354, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "%2.0f°C", id(weather_temperature_3).state);
 
         // Train Service Section
-        it.image(0, 420, id(title_train)); 
-        it.printf(240, 480, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%s", id(train_status).state.c_str());
+        // it.image(0, 420, id(title_train)); 
+        it.printf(240, 408, id(font_title), color_text, TextAlign::TOP_CENTER, "L TRAIN");
 
-        it.print(150, 536, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "TO MANHATTAN");
-        it.print(330, 536, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "TO CANARSIE");
+        it.printf(240, 472, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%s", id(train_status).state.c_str());
 
-        it.printf(150, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_due_in).state);
-        it.printf(330, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_due_in).state);
-        it.printf(150, 608, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
-        it.printf(330, 608, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_canarsie_due_at).state.c_str());
+        it.print(150, 524, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "TO MANHATTAN");
+        it.printf(150, 546, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_status_manhattan).state.c_str());
+        it.print(330, 524, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "TO CANARSIE");
+        it.printf(330, 546, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_status_canarsie).state.c_str());
 
-        it.printf(150, 652, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_next_train_due_in).state);
-        it.printf(330, 652, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_next_train_due_in).state);
-        it.printf(150, 684, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_manhattan_next_train_due_at).state.c_str());
-        it.printf(330, 684, id(font_small_book), color_white, TextAlign::TOP_CENTER, "%s", id(train_canarsie_next_train_due_at).state.c_str());
+        it.printf(150, 584, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_due_in).state);
+        it.printf(330, 584, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_due_in).state);
+        it.printf(150, 616, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
+        it.printf(330, 616, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_manhattan_due_at).state.c_str());
+
+        it.printf(150, 652, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_next_train_due_in).state);
+        it.printf(330, 652, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_next_train_due_in).state);
+        it.printf(150, 684, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_manhattan_next_train_due_at).state.c_str());
+        it.printf(330, 684, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_canarsie_next_train_due_at).state.c_str());
       }
+
 captive_portal:
