@@ -244,14 +244,7 @@ text_sensor:
          - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
-    entity_id: sensor.mta_subway_l_service_status
-    id: train_service_status
-    on_value:
-      then:
-         - lambda: 'id(data_updated) = true;'
-
-  - platform: homeassistant
-    entity_id: weather.hourly
+    entity_id: weather.valhalla_hourly
     id: weather_state
     on_value:
       then:
@@ -448,8 +441,12 @@ display:
         // it.image(0, 420, id(title_train)); 
         it.printf(240, 408, id(font_title), color_text, TextAlign::TOP_CENTER, "L TRAIN");
 
-        it.print(150, 536, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "TO MANHATTAN");
-        it.print(330, 536, id(font_small_bold), color_white, TextAlign::TOP_CENTER, "TO CANARSIE");
+        it.printf(240, 472, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%s", id(train_status).state.c_str());
+
+        it.print(150, 524, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "TO MANHATTAN");
+        it.printf(150, 546, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_status_manhattan).state.c_str());
+        it.print(330, 524, id(font_small_bold), color_text, TextAlign::TOP_CENTER, "TO CANARSIE");
+        it.printf(330, 546, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_status_canarsie).state.c_str());
 
         it.printf(150, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_manhattan_due_in).state);
         it.printf(330, 576, id(font_medium_bold), color_white, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_due_in).state);
