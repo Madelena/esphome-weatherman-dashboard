@@ -54,6 +54,10 @@ globals:
     type: bool
     restore_value: no
     initial_value: 'false'
+  - id: recorded_display_refresh
+    type: int
+    restore_value: yes
+    initial_value: '0'
 
 
 
@@ -184,8 +188,18 @@ binary_sensor:
     id: motion_detected
 
 
-# Call Subway and Weather sensors from HA.
+
 sensor:
+  - platform: template
+    name: "weatherman: Display Last Update"
+    device_class: timestamp
+    id: display_last_update
+    
+  - platform: template
+    name: "weatherman: Recorded Display Refresh"
+    lambda: 'return id(recorded_display_refresh);'
+  
+  # Call Subway and Weather sensors from HA.
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan 
     id: train_manhattan_due_in
