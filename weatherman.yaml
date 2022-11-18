@@ -37,6 +37,13 @@ button:
     name: "weatherman: Shutdown"
   - platform: restart
     name: "weatherman: Restart"
+  - platform: template
+    name: "weatherman: Refresh Screen"
+    entity_category: config
+    on_press:
+      - script.execute: update_screen
+      
+      
 # Global variables for detecting if the display needs to be refreshed. (Thanks @paviro!)
 globals:
   - id: data_updated
@@ -48,6 +55,16 @@ globals:
     restore_value: no
     initial_value: 'false'
 
+
+
+script:
+  - id: update_screen
+    then:
+      - lambda: 'id(data_updated) = false;'
+      - component.update: eink_display
+      - lambda: 'id(recorded_display_refresh) += 1;'
+      - lambda: 'id(display_last_update).publish_state(id(homeassistant_time).now().timestamp);'
+      
 
 # Check whether the display needs to be refreshed every minute,
 # based on whether new data is received or motion is detected. (Thanks @paviro!)
@@ -62,15 +79,13 @@ time:
               condition:
                 lambda: 'return id(data_updated) == true;'
               then:
-                - lambda: 'id(initial_data_received) = true;'
                 - if:
                     condition:
                       binary_sensor.is_on: motion_detected
                     then:
                       - logger.log: "Sensor data updated and activity in home detected: Refreshing display..."
-                - component.update: eink_display
-                - lambda: 'id(data_updated) = false;'
-              else:
+                      - script.execute: update_screen
+                    else:
                       - logger.log: "Sensor data updated but no activity in home - skipping display refresh."
               else:
                 - logger.log: "No sensors updated - skipping display refresh."
