@@ -31,6 +31,12 @@ api:
 
 ota:
 
+
+button:
+  - platform: shutdown
+    name: "weatherman: Shutdown"
+  - platform: restart
+    name: "weatherman: Restart"
 # Global variables for detecting if the display needs to be refreshed. (Thanks @paviro!)
 globals:
   - id: data_updated
