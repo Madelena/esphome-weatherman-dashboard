@@ -193,10 +193,15 @@ sensor:
   - platform: template
     name: "weatherman: Display Last Update"
     device_class: timestamp
+    entity_category: "diagnostic"
     id: display_last_update
     
   - platform: template
     name: "weatherman: Recorded Display Refresh"
+    accuracy_decimals: 0
+    unit_of_measurement: "Refreshs"
+    state_class: "total_increasing"
+    entity_category: "diagnostic"
     lambda: 'return id(recorded_display_refresh);'
   
   # Call Subway and Weather sensors from HA.
