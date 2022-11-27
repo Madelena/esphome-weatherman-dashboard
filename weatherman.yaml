@@ -278,6 +278,7 @@ sensor:
   - platform: wifi_signal
     name: "WiFi Signal Sensor"
     id: wifisignal
+    entity_category: "diagnostic"
     update_interval: 60s
 
 
