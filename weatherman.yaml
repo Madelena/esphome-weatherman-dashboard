@@ -54,9 +54,9 @@ time:
                       binary_sensor.is_on: motion_detected
                     then:
                       - logger.log: "Sensor data updated and activity in home detected: Refreshing display..."
-                - component.update: eink_display
-                - lambda: 'id(data_updated) = false;'
-              else:
+                      - component.update: eink_display
+                      - lambda: 'id(data_updated) = false;'
+                    else:
                       - logger.log: "Sensor data updated but no activity in home - skipping display refresh."
               else:
                 - logger.log: "No sensors updated - skipping display refresh."
