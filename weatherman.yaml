@@ -114,7 +114,7 @@ font:
   - file: 'fonts/GothamRnd-Bold.ttf'
     id: font_large_bold
     size: 108
-    glyphs: [' ', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C']
+    glyphs: [' ', '-', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C']
   - file: 'fonts/GothamRnd-Bold.ttf'
     id: font_title
     size: 54
