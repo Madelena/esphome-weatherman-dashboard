@@ -189,8 +189,8 @@ binary_sensor:
     id: motion_detected
 
 
-
 sensor:
+  # Create sensors for monitoring Weatherman remotely.
   - platform: template
     name: "Weatherman - Display Last Update"
     device_class: timestamp
@@ -200,11 +200,18 @@ sensor:
   - platform: template
     name: "Weatherman - Recorded Display Refresh"
     accuracy_decimals: 0
-    unit_of_measurement: "Refreshs"
+    unit_of_measurement: "Refreshes"
     state_class: "total_increasing"
     entity_category: "diagnostic"
     lambda: 'return id(recorded_display_refresh);'
   
+  - platform: wifi_signal
+    name: "Weatherman - WiFi Signal Strength"
+    id: wifisignal
+    unit_of_measurement: "dBm"
+    entity_category: "diagnostic"
+    update_interval: 60s
+
   # Call Subway and Weather sensors from HA.
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan 
@@ -275,12 +282,6 @@ sensor:
     on_value:
       then:
         - lambda: 'id(data_updated) = true;'
-
-  - platform: wifi_signal
-    name: "WiFi Signal Sensor"
-    id: wifisignal
-    entity_category: "diagnostic"
-    update_interval: 60s
 
 
 text_sensor:
