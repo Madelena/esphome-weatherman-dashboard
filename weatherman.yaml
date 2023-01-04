@@ -531,6 +531,13 @@ display:
         it.printf(330, 652, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_next_train_due_in).state);
         it.printf(150, 684, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_manhattan_next_train_due_at).state.c_str());
         it.printf(330, 684, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_canarsie_next_train_due_at).state.c_str());
+
+        // Refresh Timestamp
+        // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+        char str[17];
+        time_t currTime = id(homeassistant_time).now().timestamp;
+        strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
+        it.printf(240, 710, id(font_small_book), color_text, TextAlign::TOP_CENTER, "REFRESHED AT %s", str);
       }
 
 captive_portal:
