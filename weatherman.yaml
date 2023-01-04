@@ -103,8 +103,8 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Esphome-Web-901078"
-    password: "2JOrpBYEHQsV"
+    ssid: !secret weatherman_ap_ssid
+    password: !secret weatherman_ap_password
 
 
 # Include custom fonts
