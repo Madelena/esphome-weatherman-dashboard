@@ -9,6 +9,14 @@ esphome:
       priority: 200.0
       then:
         - component.update: eink_display
+        - wait_until:
+            condition:
+              lambda: 'return id(data_updated) == true;'
+              # Wait a bit longer so all the items are received
+        - delay: 5s
+        - logger.log: "Initial sensor data received: Refreshing display..."
+        - lambda: 'id(initial_data_received) = true;'
+        - script.execute: update_screen
 
 esp32:
   board: esp32dev
@@ -23,6 +31,19 @@ api:
 
 ota:
 
+
+button:
+  - platform: shutdown
+    name: "weatherman: Shutdown"
+  - platform: restart
+    name: "weatherman: Restart"
+  - platform: template
+    name: "weatherman: Refresh Screen"
+    entity_category: config
+    on_press:
+      - script.execute: update_screen
+      
+      
 # Global variables for detecting if the display needs to be refreshed. (Thanks @paviro!)
 globals:
   - id: data_updated
@@ -33,7 +54,21 @@ globals:
     type: bool
     restore_value: no
     initial_value: 'false'
+  - id: recorded_display_refresh
+    type: int
+    restore_value: yes
+    initial_value: '0'
 
+
+
+script:
+  - id: update_screen
+    then:
+      - lambda: 'id(data_updated) = false;'
+      - component.update: eink_display
+      - lambda: 'id(recorded_display_refresh) += 1;'
+      - lambda: 'id(display_last_update).publish_state(id(homeassistant_time).now().timestamp);'
+      
 
 # Check whether the display needs to be refreshed every minute,
 # based on whether new data is received or motion is detected. (Thanks @paviro!)
@@ -48,14 +83,12 @@ time:
               condition:
                 lambda: 'return id(data_updated) == true;'
               then:
-                - lambda: 'id(initial_data_received) = true;'
                 - if:
                     condition:
                       binary_sensor.is_on: motion_detected
                     then:
                       - logger.log: "Sensor data updated and activity in home detected: Refreshing display..."
-                      - component.update: eink_display
-                      - lambda: 'id(data_updated) = false;'
+                      - script.execute: update_screen
                     else:
                       - logger.log: "Sensor data updated but no activity in home - skipping display refresh."
               else:
@@ -155,8 +188,23 @@ binary_sensor:
     id: motion_detected
 
 
-# Call Subway and Weather sensors from HA.
+
 sensor:
+  - platform: template
+    name: "Weatherman - Display Last Update"
+    device_class: timestamp
+    entity_category: "diagnostic"
+    id: display_last_update
+    
+  - platform: template
+    name: "Weatherman - Recorded Display Refresh"
+    accuracy_decimals: 0
+    unit_of_measurement: "Refreshs"
+    state_class: "total_increasing"
+    entity_category: "diagnostic"
+    lambda: 'return id(recorded_display_refresh);'
+  
+  # Call Subway and Weather sensors from HA.
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan 
     id: train_manhattan_due_in
@@ -230,6 +278,7 @@ sensor:
   - platform: wifi_signal
     name: "WiFi Signal Sensor"
     id: wifisignal
+    entity_category: "diagnostic"
     update_interval: 60s
 
 
