@@ -191,13 +191,13 @@ binary_sensor:
 
 sensor:
   - platform: template
-    name: "weatherman: Display Last Update"
+    name: "Weatherman - Display Last Update"
     device_class: timestamp
     entity_category: "diagnostic"
     id: display_last_update
     
   - platform: template
-    name: "weatherman: Recorded Display Refresh"
+    name: "Weatherman - Recorded Display Refresh"
     accuracy_decimals: 0
     unit_of_measurement: "Refreshs"
     state_class: "total_increasing"
