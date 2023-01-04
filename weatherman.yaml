@@ -34,11 +34,11 @@ ota:
 
 button:
   - platform: shutdown
-    name: "weatherman: Shutdown"
+    name: "Weatherman - Shutdown"
   - platform: restart
-    name: "weatherman: Restart"
+    name: "Weatherman - Restart"
   - platform: template
-    name: "weatherman: Refresh Screen"
+    name: "Weatherman - Refresh Screen"
     entity_category: config
     on_press:
       - script.execute: update_screen
