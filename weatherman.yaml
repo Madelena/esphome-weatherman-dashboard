@@ -23,6 +23,7 @@ esp32:
   framework:
     type: arduino
 
+
 # Enable logging
 logger:
 
@@ -60,7 +61,7 @@ globals:
     initial_value: '0'
 
 
-
+# Script for updating screen - Refresh display and publish refresh count and time. (Thanks @paviro!)
 script:
   - id: update_screen
     then:
