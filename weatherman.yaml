@@ -127,7 +127,7 @@ font:
   - file: 'fonts/GothamRnd-Bold.ttf'
     id: font_small_bold
     size: 18
-    # glyphs: ['°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', 'M', 'I', 'N']
+    # glyphs: [' ', '-', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', 'M', 'I', 'N']
 
 
   # Include Material Design Icons font
