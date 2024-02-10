@@ -42,7 +42,18 @@ button:
     entity_category: config
     on_press:
       - script.execute: update_screen
-      
+  
+select:
+  - platform: template
+    name: "weatherman: Appearance"
+    id: appearance
+    options:
+     - "Dark Mode"
+     - "Light Mode"
+    initial_option: "Dark Mode"
+    restore_value: true
+    optimistic: true
+    entity_category: config
       
 # Global variables for detecting if the display needs to be refreshed. (Thanks @paviro!)
 globals:
@@ -402,22 +413,6 @@ text_sensor:
       then:
          - lambda: 'id(data_updated) = true;'
 
-
-# Define colors
-# This design is white on black so this is necessary.
-color:
-  - id: color_bg
-    red: 0%
-    green: 0%
-    blue: 0%
-    white: 0%
-  - id: color_text
-    red: 0%
-    green: 0%
-    blue: 0%
-    white: 100%
-
-
 # Pins for Waveshare ePaper ESP Board
 spi:
   clk_pin: GPIO13
@@ -472,8 +467,23 @@ display:
           {"windy-variant", "\U000F059E"},
         };
 
+        auto color_text = Color::WHITE;
+        auto color_bg = Color::BLACK;
+      
+        auto index = id(appearance).active_index();
+      
+        if (index.has_value()) {
+          if (index.value() == 1) {
+            ESP_LOGD("custom", "Light Mode is selected - using black text on a white background.");
+            color_text = Color::BLACK;
+            color_bg = Color::WHITE;
+          } else {
+            ESP_LOGD("custom", "Dark Mode is selected - using white text on a black background.");
+          }
+        }
+
       // Fill background.
-      // it.fill(color_bg);
+      it.fill(color_bg);
 
       // Show loading screen before data is received.
       if (id(initial_data_received) == false) {
