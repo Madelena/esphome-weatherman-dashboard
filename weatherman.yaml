@@ -23,6 +23,7 @@ esp32:
   framework:
     type: arduino
 
+
 # Enable logging
 logger:
 
@@ -34,11 +35,11 @@ ota:
 
 button:
   - platform: shutdown
-    name: "weatherman: Shutdown"
+    name: "Weatherman - Shutdown"
   - platform: restart
-    name: "weatherman: Restart"
+    name: "Weatherman - Restart"
   - platform: template
-    name: "weatherman: Refresh Screen"
+    name: "Weatherman - Refresh Screen"
     entity_category: config
     on_press:
       - script.execute: update_screen
@@ -71,7 +72,7 @@ globals:
     initial_value: '0'
 
 
-
+# Script for updating screen - Refresh display and publish refresh count and time. (Thanks @paviro!)
 script:
   - id: update_screen
     then:
@@ -113,8 +114,8 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Esphome-Web-901078"
-    password: "2JOrpBYEHQsV"
+    ssid: !secret weatherman_ap_ssid
+    password: !secret weatherman_ap_password
 
 
 # Include custom fonts
@@ -125,7 +126,7 @@ font:
   - file: 'fonts/GothamRnd-Bold.ttf'
     id: font_large_bold
     size: 108
-    glyphs: [' ', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C']
+    glyphs: [' ', '-', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C']
   - file: 'fonts/GothamRnd-Bold.ttf'
     id: font_title
     size: 54
@@ -137,7 +138,7 @@ font:
   - file: 'fonts/GothamRnd-Bold.ttf'
     id: font_small_bold
     size: 18
-    # glyphs: ['°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', 'M', 'I', 'N']
+    # glyphs: [' ', '-', '°', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', 'M', 'I', 'N']
 
 
   # Include Material Design Icons font
@@ -199,31 +200,43 @@ binary_sensor:
     id: motion_detected
 
 
-
 sensor:
+  # Create sensors for monitoring Weatherman remotely.
   - platform: template
-    name: "weatherman: Display Last Update"
+    name: "Weatherman - Display Last Update"
     device_class: timestamp
+    entity_category: "diagnostic"
     id: display_last_update
     
   - platform: template
-    name: "weatherman: Recorded Display Refresh"
+    name: "Weatherman - Recorded Display Refresh"
+    accuracy_decimals: 0
+    unit_of_measurement: "Refreshes"
+    state_class: "total_increasing"
+    entity_category: "diagnostic"
     lambda: 'return id(recorded_display_refresh);'
   
+  - platform: wifi_signal
+    name: "Weatherman - WiFi Signal Strength"
+    id: wifisignal
+    unit_of_measurement: "dBm"
+    entity_category: "diagnostic"
+    update_interval: 60s
+
   # Call Subway and Weather sensors from HA.
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan 
     id: train_manhattan_due_in
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_canarsie
     id: train_canarsie_due_in
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
     
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan
@@ -231,7 +244,7 @@ sensor:
     id: train_manhattan_next_train_due_in
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
     
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_canarsie
@@ -239,7 +252,7 @@ sensor:
     id: train_canarsie_next_train_due_in
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: weather.hourly
@@ -247,7 +260,7 @@ sensor:
     id: weather_temperature
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.weatherman_data
@@ -255,7 +268,7 @@ sensor:
     id: weather_temperature_0
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.weatherman_data
@@ -263,7 +276,7 @@ sensor:
     id: weather_temperature_1
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.weatherman_data
@@ -271,7 +284,7 @@ sensor:
     id: weather_temperature_2
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.weatherman_data
@@ -279,12 +292,7 @@ sensor:
     id: weather_temperature_3
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
-
-  - platform: wifi_signal
-    name: "WiFi Signal Sensor"
-    id: wifisignal
-    update_interval: 60s
+        - lambda: 'id(data_updated) = true;'
 
 
 text_sensor:
@@ -294,7 +302,7 @@ text_sensor:
     id: train_manhattan_due_at
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_canarsie
@@ -302,7 +310,7 @@ text_sensor:
     id: train_canarsie_due_at
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_manhattan
@@ -310,7 +318,7 @@ text_sensor:
     id: train_manhattan_next_train_due_at
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   
   - platform: homeassistant
     entity_id: sensor.gtfs_mta_subway_canarsie
@@ -318,14 +326,14 @@ text_sensor:
     id: train_canarsie_next_train_due_at
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: weather.valhalla_hourly
     id: weather_state
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.weatherman_data
@@ -333,63 +341,63 @@ text_sensor:
     id: weather_condition_now
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_condition_0
     id: weather_condition_0
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_timestamp_0
     id: weather_timestamp_0
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_condition_1
     id: weather_condition_1
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_timestamp_1
     id: weather_timestamp_1
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_condition_2
     id: weather_condition_2
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_timestamp_2
     id: weather_timestamp_2
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_condition_3
     id: weather_condition_3
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: weather_timestamp_3
     id: weather_timestamp_3
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
   - platform: homeassistant
     entity_id: sensor.weatherman_data
@@ -397,21 +405,21 @@ text_sensor:
     id: train_status
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: train_status_manhattan
     id: train_status_manhattan
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
   - platform: homeassistant
     entity_id: sensor.weatherman_data
     attribute: train_status_canarsie
     id: train_status_canarsie
     on_value:
       then:
-         - lambda: 'id(data_updated) = true;'
+        - lambda: 'id(data_updated) = true;'
 
 # Pins for Waveshare ePaper ESP Board
 spi:
@@ -534,6 +542,13 @@ display:
         it.printf(330, 652, id(font_medium_bold), color_text, TextAlign::TOP_CENTER, "%2.0f MIN", id(train_canarsie_next_train_due_in).state);
         it.printf(150, 684, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_manhattan_next_train_due_at).state.c_str());
         it.printf(330, 684, id(font_small_book), color_text, TextAlign::TOP_CENTER, "%s", id(train_canarsie_next_train_due_at).state.c_str());
+
+        // Refresh Timestamp
+        // Code by EnsconcE from https://community.home-assistant.io/t/esphome-show-time/348903
+        char str[17];
+        time_t currTime = id(homeassistant_time).now().timestamp;
+        strftime(str, sizeof(str), "%H:%M", localtime(&currTime));
+        it.printf(240, 710, id(font_small_book), color_text, TextAlign::TOP_CENTER, "REFRESHED AT %s", str);
       }
 
 captive_portal:

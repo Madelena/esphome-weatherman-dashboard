@@ -31,6 +31,25 @@ This is part of the ecosystem for [my Home Assistant configuration](https://gith
 5. Once booted, flash `weatherman.yaml` the ESP32 board using ESPHome.
 6. Enjoy!
 
+## Features
+
+## Intelligent Screen Refreshing
+To reduce the frequency of screen refreshes and to prolong the life of the e-ink screen, the screen will now only refresh when motion (or any template criteria) sensor `binary_sensor.weatherman_motion_detected` is on. I have it set up so that it wakes up when there are any motions from my sensors in the living room.
+
+## Last Refreshed Timestamp
+The last update timestamp can be displayed on the screen itself. No more wondering when the screen was last refreshed!
+
+## Remote Control and Monitoring
+The screen can now be controlled and monitored remotely. The screen can be either refreshed manually, restarted, or safely shut down through buttons in your HA. The number of screen refreshes in its lifetime as well as its last update timestamp and wifi signal strength can also be monitored.
+
+![List of available sensors and buttons](https://user-images.githubusercontent.com/4341881/210636590-40ec6a53-2bae-40db-afe2-6246cfc785a4.png)
+![Refresh Screen Count example](https://user-images.githubusercontent.com/4341881/210636618-c59e18d6-d31a-4ddd-98a9-2b5a1094be67.png)
+
+Other changes:
+* Negative temperatures can now be displayed. Perfect for winter.
+* A nice loading screen is shown before any data is received.
+* Titles are now in text rather than bitmaps. Much easier to change it to anything you like.
+
 ## Data Sources
 
 - Metno Hourly Weather Forecast HA integration
