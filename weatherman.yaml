@@ -46,7 +46,7 @@ button:
   
 select:
   - platform: template
-    name: "weatherman: Appearance"
+    name: Appearance
     id: appearance
     options:
      - "Dark Mode"
@@ -55,6 +55,9 @@ select:
     restore_value: true
     optimistic: true
     entity_category: config
+    on_value:
+      then:
+        - script.execute: update_screen
       
 # Global variables for detecting if the display needs to be refreshed. (Thanks @paviro!)
 globals:
