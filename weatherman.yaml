@@ -438,7 +438,9 @@ display:
     id: eink_display
     cs_pin: GPIO15
     dc_pin: GPIO27
-    busy_pin: GPIO25
+    busy_pin:
+      number: GPIO25
+      inverted: true
     reset_pin: GPIO26
     reset_duration: 2ms
     model: 7.50inV2
